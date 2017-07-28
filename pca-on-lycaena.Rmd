@@ -9,6 +9,10 @@ output:
 
 ### Some sort of barplot or flight times chart?
 
+#TODO: 
+1. get wing pattern data & update code
+2. get wing pattern schematic & wing images
+3. 
 
 ### Reading data into R for PCA
 
