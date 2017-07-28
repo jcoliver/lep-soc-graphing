@@ -1,0 +1,72 @@
+---
+title: "Graphing in R"
+author: "Jeff Oliver"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document: default
+  pdf_document: default
+---
+
+### Some sort of barplot or flight times chart?
+
+
+### Reading data into R for PCA
+
+### Running PCA
+So, on to the code:
+```{r}
+pca.fit <- prcomp(x = otter[, -c(1:3)], scale. = TRUE)
+```
+
+```{r}
+pca.summary <- summary(pca.fit)
+ls(pca.summary) # Lists the objects produced by summary
+```
+
+### Plotting the results
+We are interested to know (1) what are the important factors that emerge from the PCA (i.e. which ones explain a lot of variation) and (2) what do these factors actually say about the variation observed in our data. For (1), look at the `importance` object in the summary:
+```{r}
+pca.summary$importance
+```
+
+Instead, we can plot the scores of the first two principal components using the standard `plot` command, using the scores that are stored in the `x` object of `pca.fit`:
+```{r}
+plot(x = pca.fit$x[, 1],
+     y = pca.fit$x[, 2],
+     xlab = "PC 1",
+     ylab = "PC 2")
+```
+
+Well, maybe that plot isn't so useful either. It does help a bit if we color the points by species, though. We start by creating a small vector which only contains the species names; we'll use this for the legend and for assigning colors:
+```{r}
+# Pull out the unique values in the 'species' column
+species.names <- unique(otter$species)
+species.names # a quick look at the values in the vector
+```
+  
+We want a vector of colors, too, one for each species. Since there are four species, we have four colors:
+```{r}
+legend.cols <- c("black", "green4", "cyan3", "red3") 
+```
+
+The legend.cols vector will be used for the legend, but we still need a color vector for each _sample_. We can use the indexing of the `species.names` and `legend.cols` to create a vector which has a value for each of the points we want to plot. Here we first assign all values the same color (the first color in the `legend.cols` vector). Then we compare values in the `otter$species` column to the second, third, and fourth possible values in the `species.names` vector.
+```{r}
+pt.cols <- rep(x = legend.cols[1], length = nrow(otter))
+pt.cols[otter$species == species.names[2]] <- legend.cols[2]
+pt.cols[otter$species == species.names[3]] <- legend.cols[3]
+pt.cols[otter$species == species.names[4]] <- legend.cols[4]
+```
+
+> Question: Why did we not do the assignment / comparison for the first element in `species.names` and `legend.cols`?
+
+And finally, we draw the plot, adding point colors through the `col` parameter and adding the legend after the plot is drawn.
+```{r}
+plot(x = pca.fit$x[, 1],
+     y = pca.fit$x[, 2],
+     xlab = "PC 1",
+     ylab = "PC 2",
+     pch = 19,
+     col = pt.cols)
+legend("bottomleft", legend = species.names, pch = 19, col = legend.cols, cex = 0.8)
+```
+
